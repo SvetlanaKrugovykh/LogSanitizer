@@ -27,7 +27,7 @@ class LogCleaner {
         await fs.writeFile(filePath, cleanedContent)
         return true
       }
-      
+
       return false
     } catch (error) {
       console.error(`Error cleaning file ${filePath}:`, error.message)
@@ -44,14 +44,14 @@ class LogCleaner {
 
       const files = await fs.readdir(dirPath)
       const logFiles = files.filter(file => file.endsWith('.log'))
-      
+
       let cleaned = 0
       let errors = 0
 
       for (const file of logFiles) {
         const filePath = path.join(dirPath, file)
         const result = await this.cleanFile(filePath)
-        
+
         if (result === true) {
           cleaned++
           console.log(`Cleaned: ${file}`)

@@ -52,7 +52,7 @@ class LogSanitizer {
   async performCleaning() {
     try {
       const result = await this.cleaner.cleanDirectory(this.logsDir)
-      
+
       if (result.cleaned > 0) {
         console.log(`Cleaning completed: ${result.cleaned} files cleaned, ${result.errors} errors`)
       }

@@ -1,23 +1,29 @@
 {
-  "name": "log-sanitizer",
-  "version": "1.0.0",
-  "description": "Node.js application for log management - cleaning, rotation, and archival of PM2 logs",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest"
-  },
-  "keywords": ["logs", "pm2", "rotation", "sanitizer", "cleanup"],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "node-cron": "^3.0.3",
-    "fs-extra": "^11.1.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1",
-    "jest": "^29.7.0"
-  }
+	"name": "log-sanitizer",
+	"version": "1.0.0",
+	"description": "Node.js application for log management - cleaning, rotation, and archival of PM2 logs",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "node src/index.js",
+		"dev": "nodemon src/index.js",
+		"test": "jest"
+	},
+	"keywords": [
+		"logs",
+		"pm2",
+		"rotation",
+		"sanitizer",
+		"cleanup"
+	],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"dotenv": "^16.3.1",
+		"node-cron": "^3.0.3",
+		"fs-extra": "^11.1.1"
+	},
+	"devDependencies": {
+		"nodemon": "^3.0.1",
+		"jest": "^29.7.0"
+	}
 }
