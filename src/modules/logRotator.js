@@ -22,7 +22,9 @@ class LogRotator {
       const today = new Date()
       const dateStr = today.toISOString().split('T')[0]
 
+      // Create the full archive directory path
       await fs.ensureDir(this.legacyDir)
+      this.log(`Ensured archive directory exists: ${this.legacyDir}`)
 
       if (!await fs.pathExists(this.logsDir)) {
         this.log(`Source directory not found: ${this.logsDir}`)
@@ -50,6 +52,8 @@ class LogRotator {
           const legacyFileName = `${baseName}-${dateStr}.log`
           const targetPath = path.join(this.legacyDir, legacyFileName)
 
+          this.log(`Copying ${sourcePath} -> ${targetPath}`)
+
           // Copy to legacy directory
           await fs.copy(sourcePath, targetPath)
 
@@ -57,7 +61,7 @@ class LogRotator {
           await fs.writeFile(sourcePath, '')
 
           rotated++
-          this.log(`Rotated: ${file} -> ${legacyFileName}`)
+          this.log(`Rotated: ${file} -> ${legacyFileName} (saved to ${targetPath})`)
 
         } catch (error) {
           this.error(`Error rotating ${file}`, error)
