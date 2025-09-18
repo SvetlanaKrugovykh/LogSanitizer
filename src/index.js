@@ -14,10 +14,10 @@ class LogSanitizer {
     this.keepLegacyDays = process.env.KEEP_LEGACY_DAYS || 30
 
     // Create full archive path with absolute path resolution
-    const baseLegacyPath = path.isAbsolute(this.legacyDir) 
-      ? this.legacyDir 
+    const baseLegacyPath = path.isAbsolute(this.legacyDir)
+      ? this.legacyDir
       : path.resolve(process.cwd(), this.legacyDir)
-    
+
     this.archivePath = path.join(baseLegacyPath, this.archiveSubdir)
 
     this.initializeModules()
