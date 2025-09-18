@@ -1,5 +1,6 @@
 require('dotenv').config()
 const cron = require('node-cron')
+const path = require('path')
 const LogCleaner = require('./modules/logCleaner')
 const LogRotator = require('./modules/logRotator')
 
@@ -12,8 +13,12 @@ class LogSanitizer {
     this.monitoringInterval = process.env.MONITORING_INTERVAL_MINUTES || 30
     this.keepLegacyDays = process.env.KEEP_LEGACY_DAYS || 30
 
-    // Create full archive path
-    this.archivePath = `${this.legacyDir}/${this.archiveSubdir}`
+    // Create full archive path with absolute path resolution
+    const baseLegacyPath = path.isAbsolute(this.legacyDir) 
+      ? this.legacyDir 
+      : path.resolve(process.cwd(), this.legacyDir)
+    
+    this.archivePath = path.join(baseLegacyPath, this.archiveSubdir)
 
     this.initializeModules()
     this.setupScheduler()
@@ -60,7 +65,8 @@ class LogSanitizer {
     this.log(`- Legacy retention: ${this.keepLegacyDays} days`)
     this.log(`- Logs directory: ${this.logsDir}`)
     this.log(`- Legacy directory: ${this.legacyDir}`)
-    this.log(`- Archive directory: ${this.archivePath}`)
+    this.log(`- Archive directory (absolute): ${this.archivePath}`)
+    this.log(`- Working directory: ${process.cwd()}`)
   }
 
   async performCleaning() {

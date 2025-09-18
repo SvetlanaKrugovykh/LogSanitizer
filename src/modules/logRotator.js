@@ -57,11 +57,17 @@ class LogRotator {
           // Copy to legacy directory
           await fs.copy(sourcePath, targetPath)
 
+          // Verify the file was created
+          const fileExists = await fs.pathExists(targetPath)
+          if (!fileExists) {
+            throw new Error(`Failed to create archive file: ${targetPath}`)
+          }
+
           // Truncate original file
           await fs.writeFile(sourcePath, '')
 
           rotated++
-          this.log(`Rotated: ${file} -> ${legacyFileName} (saved to ${targetPath})`)
+          this.log(`Rotated: ${file} -> ${legacyFileName} (saved to ${targetPath}) - File exists: ${fileExists}`)
 
         } catch (error) {
           this.error(`Error rotating ${file}`, error)
