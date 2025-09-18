@@ -6,6 +6,15 @@ class LogCleaner {
     this.patterns = templates
   }
 
+  log(message) {
+    console.log(`[${new Date().toISOString()}] ${message}`)
+  }
+
+  error(message, error = null) {
+    const errorMsg = error ? `${message}: ${error.message}` : message
+    console.error(`[${new Date().toISOString()}] ERROR: ${errorMsg}`)
+  }
+
   async cleanFile(filePath) {
     try {
       if (!await fs.pathExists(filePath)) {
@@ -30,7 +39,7 @@ class LogCleaner {
 
       return false
     } catch (error) {
-      console.error(`Error cleaning file ${filePath}:`, error.message)
+      this.error(`Error cleaning file ${filePath}`, error)
       return false
     }
   }
@@ -38,7 +47,7 @@ class LogCleaner {
   async cleanDirectory(dirPath) {
     try {
       if (!await fs.pathExists(dirPath)) {
-        console.log(`Directory not found: ${dirPath}`)
+        this.log(`Directory not found: ${dirPath}`)
         return { cleaned: 0, errors: 0 }
       }
 
@@ -54,15 +63,17 @@ class LogCleaner {
 
         if (result === true) {
           cleaned++
-          console.log(`Cleaned: ${file}`)
-        } else if (result === false && result !== null) {
+          this.log(`Cleaned: ${file}`)
+        } else if (result === false) {
+          // File was processed but no changes needed
+        } else {
           errors++
         }
       }
 
       return { cleaned, errors, total: logFiles.length }
     } catch (error) {
-      console.error(`Error cleaning directory ${dirPath}:`, error.message)
+      this.error(`Error cleaning directory ${dirPath}`, error)
       return { cleaned: 0, errors: 1, total: 0 }
     }
   }

@@ -7,6 +7,15 @@ class LogRotator {
     this.legacyDir = legacyDir
   }
 
+  log(message) {
+    console.log(`[${new Date().toISOString()}] ${message}`)
+  }
+
+  error(message, error = null) {
+    const errorMsg = error ? `${message}: ${error.message}` : message
+    console.error(`[${new Date().toISOString()}] ERROR: ${errorMsg}`)
+  }
+
   async rotateToday() {
     try {
       const today = new Date()
@@ -15,7 +24,7 @@ class LogRotator {
       await fs.ensureDir(this.legacyDir)
 
       if (!await fs.pathExists(this.logsDir)) {
-        console.log(`Source directory not found: ${this.logsDir}`)
+        this.log(`Source directory not found: ${this.logsDir}`)
         return { rotated: 0, errors: 0 }
       }
 
@@ -47,10 +56,10 @@ class LogRotator {
           await fs.writeFile(sourcePath, '')
 
           rotated++
-          console.log(`Rotated: ${file} -> ${legacyFileName}`)
+          this.log(`Rotated: ${file} -> ${legacyFileName}`)
 
         } catch (error) {
-          console.error(`Error rotating ${file}:`, error.message)
+          this.error(`Error rotating ${file}`, error)
           errors++
         }
       }
@@ -58,7 +67,7 @@ class LogRotator {
       return { rotated, errors, total: logFiles.length }
 
     } catch (error) {
-      console.error('Error during log rotation:', error.message)
+      this.error('Error during log rotation', error)
       return { rotated: 0, errors: 1, total: 0 }
     }
   }
@@ -90,12 +99,12 @@ class LogRotator {
               const filePath = path.join(this.legacyDir, file)
               await fs.unlink(filePath)
               deleted++
-              console.log(`Deleted old log: ${file}`)
+              this.log(`Deleted old log: ${file}`)
             }
           }
 
         } catch (error) {
-          console.error(`Error deleting ${file}:`, error.message)
+          this.error(`Error deleting ${file}`, error)
           errors++
         }
       }
@@ -103,7 +112,7 @@ class LogRotator {
       return { deleted, errors, total: legacyFiles.length }
 
     } catch (error) {
-      console.error('Error during cleanup:', error.message)
+      this.error('Error during cleanup', error)
       return { deleted: 0, errors: 1, total: 0 }
     }
   }

@@ -15,12 +15,21 @@ class LogSanitizer {
     this.setupScheduler()
   }
 
+  log(message) {
+    console.log(`[${new Date().toISOString()}] ${message}`)
+  }
+
+  error(message, error = null) {
+    const errorMsg = error ? `${message}: ${error.message}` : message
+    console.error(`[${new Date().toISOString()}] ERROR: ${errorMsg}`)
+  }
+
   initializeModules() {
     try {
       const templates = require('../templates.js')
       this.cleaner = new LogCleaner(templates)
     } catch (error) {
-      console.log('Templates file not found, using empty patterns')
+      this.log('Templates file not found, using empty patterns')
       this.cleaner = new LogCleaner([])
     }
 
@@ -31,7 +40,7 @@ class LogSanitizer {
     // Daily log rotation at specified hour
     const rotationCron = `0 ${this.rotationHour} * * *`
     cron.schedule(rotationCron, async () => {
-      console.log(`Starting daily log rotation at ${new Date().toISOString()}`)
+      this.log(`Starting daily log rotation`)
       await this.performRotation()
     })
 
@@ -41,52 +50,54 @@ class LogSanitizer {
       await this.performCleaning()
     })
 
-    console.log(`Log Sanitizer started:`)
-    console.log(`- Monitoring: every ${this.monitoringInterval} minutes`)
-    console.log(`- Rotation: daily at ${this.rotationHour}:00`)
-    console.log(`- Legacy retention: ${this.keepLegacyDays} days`)
-    console.log(`- Logs directory: ${this.logsDir}`)
-    console.log(`- Legacy directory: ${this.legacyDir}`)
+    this.log(`Log Sanitizer started:`)
+    this.log(`- Monitoring: every ${this.monitoringInterval} minutes`)
+    this.log(`- Rotation: daily at ${this.rotationHour}:00`)
+    this.log(`- Legacy retention: ${this.keepLegacyDays} days`)
+    this.log(`- Logs directory: ${this.logsDir}`)
+    this.log(`- Legacy directory: ${this.legacyDir}`)
   }
 
   async performCleaning() {
     try {
       const result = await this.cleaner.cleanDirectory(this.logsDir)
 
-      if (result.cleaned > 0) {
-        console.log(`Cleaning completed: ${result.cleaned} files cleaned, ${result.errors} errors`)
+      if (result.cleaned > 0 || result.errors > 0) {
+        this.log(`Cleaning completed: ${result.cleaned} files cleaned, ${result.errors} errors`)
       }
     } catch (error) {
-      console.error('Error during cleaning:', error.message)
+      this.error('Error during cleaning', error)
     }
   }
 
   async performRotation() {
     try {
+      this.log('Starting rotation process')
+
       // First, clean logs before rotation
       await this.performCleaning()
 
       // Rotate logs to legacy directory
       const rotateResult = await this.rotator.rotateToday()
-      console.log(`Rotation completed: ${rotateResult.rotated} files rotated, ${rotateResult.errors} errors`)
+      this.log(`Rotation completed: ${rotateResult.rotated} files rotated, ${rotateResult.errors} errors`)
 
       // Clean up old legacy logs
       const cleanupResult = await this.rotator.cleanupOldLogs(this.keepLegacyDays)
-      console.log(`Cleanup completed: ${cleanupResult.deleted} old files deleted, ${cleanupResult.errors} errors`)
+      this.log(`Cleanup completed: ${cleanupResult.deleted} old files deleted, ${cleanupResult.errors} errors`)
 
     } catch (error) {
-      console.error('Error during rotation:', error.message)
+      this.error('Error during rotation', error)
     }
   }
 
   // Manual operations
   async manualClean() {
-    console.log('Starting manual cleaning...')
+    this.log('Starting manual cleaning...')
     return await this.performCleaning()
   }
 
   async manualRotate() {
-    console.log('Starting manual rotation...')
+    this.log('Starting manual rotation...')
     return await this.performRotation()
   }
 }
@@ -96,12 +107,12 @@ const sanitizer = new LogSanitizer()
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
-  console.log('Log Sanitizer shutting down...')
+  console.log(`[${new Date().toISOString()}] Log Sanitizer shutting down...`)
   process.exit(0)
 })
 
 process.on('SIGTERM', () => {
-  console.log('Log Sanitizer shutting down...')
+  console.log(`[${new Date().toISOString()}] Log Sanitizer shutting down...`)
   process.exit(0)
 })
 
