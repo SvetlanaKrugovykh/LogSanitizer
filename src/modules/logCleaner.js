@@ -25,12 +25,20 @@ class LogCleaner {
       let cleanedContent = content
 
       for (const pattern of this.patterns) {
-        const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+        // Escape special regex characters but preserve newlines
+        const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const regex = new RegExp(escapedPattern, 'gi')
+        const beforeLength = cleanedContent.length
         cleanedContent = cleanedContent.replace(regex, '')
+        const afterLength = cleanedContent.length
+        
+        if (beforeLength !== afterLength) {
+          this.log(`Pattern matched in ${path.basename(filePath)}: removed ${beforeLength - afterLength} characters`)
+        }
       }
 
-      // Remove empty lines
-      cleanedContent = cleanedContent.replace(/^\s*[\r\n]/gm, '')
+      // Remove multiple consecutive empty lines
+      cleanedContent = cleanedContent.replace(/\n\s*\n\s*\n/g, '\n\n')
 
       if (content !== cleanedContent) {
         await fs.writeFile(filePath, cleanedContent)
