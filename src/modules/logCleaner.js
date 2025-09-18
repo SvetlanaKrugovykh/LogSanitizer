@@ -31,7 +31,7 @@ class LogCleaner {
         const beforeLength = cleanedContent.length
         cleanedContent = cleanedContent.replace(regex, '')
         const afterLength = cleanedContent.length
-        
+
         if (beforeLength !== afterLength) {
           this.log(`Pattern matched in ${path.basename(filePath)}: removed ${beforeLength - afterLength} characters`)
         }
