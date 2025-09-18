@@ -2,9 +2,10 @@ const fs = require('fs-extra')
 const path = require('path')
 
 class LogRotator {
-  constructor(logsDir, legacyDir) {
+  constructor(logsDir, legacyDir, cleaner = null) {
     this.logsDir = logsDir
     this.legacyDir = legacyDir
+    this.cleaner = cleaner
   }
 
   log(message) {

@@ -26,9 +26,11 @@ cp .env.example .env
 ```
 
 2. Edit `.env` with your settings:
+
 ```env
 LOGS_DIR=/root/.pm2/logs
 LEGACY_DIR=logs/legacy
+ARCHIVE_SUBDIR=daily
 ROTATION_HOUR=5
 MONITORING_INTERVAL_MINUTES=30
 KEEP_LEGACY_DAYS=30
@@ -104,7 +106,8 @@ LogSanitizer/
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `LOGS_DIR` | `/root/.pm2/logs` | Source logs directory |
-| `LEGACY_DIR` | `logs/legacy` | Archive directory |
+| `LEGACY_DIR` | `logs/legacy` | Base archive directory |
+| `ARCHIVE_SUBDIR` | `daily` | Subdirectory for daily archives |
 | `ROTATION_HOUR` | `5` | Hour for daily rotation (0-23) |
 | `MONITORING_INTERVAL_MINUTES` | `30` | Cleaning interval |
 | `KEEP_LEGACY_DAYS` | `30` | Legacy retention period |

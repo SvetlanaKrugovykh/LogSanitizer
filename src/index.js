@@ -7,9 +7,13 @@ class LogSanitizer {
   constructor() {
     this.logsDir = process.env.LOGS_DIR || '/root/.pm2/logs'
     this.legacyDir = process.env.LEGACY_DIR || 'logs/legacy'
+    this.archiveSubdir = process.env.ARCHIVE_SUBDIR || 'daily'
     this.rotationHour = process.env.ROTATION_HOUR || 5
     this.monitoringInterval = process.env.MONITORING_INTERVAL_MINUTES || 30
     this.keepLegacyDays = process.env.KEEP_LEGACY_DAYS || 30
+
+    // Create full archive path
+    this.archivePath = `${this.legacyDir}/${this.archiveSubdir}`
 
     this.initializeModules()
     this.setupScheduler()
@@ -33,7 +37,7 @@ class LogSanitizer {
       this.cleaner = new LogCleaner([])
     }
 
-    this.rotator = new LogRotator(this.logsDir, this.legacyDir)
+    this.rotator = new LogRotator(this.logsDir, this.archivePath)
   }
 
   setupScheduler() {
@@ -56,6 +60,7 @@ class LogSanitizer {
     this.log(`- Legacy retention: ${this.keepLegacyDays} days`)
     this.log(`- Logs directory: ${this.logsDir}`)
     this.log(`- Legacy directory: ${this.legacyDir}`)
+    this.log(`- Archive directory: ${this.archivePath}`)
   }
 
   async performCleaning() {
@@ -74,10 +79,7 @@ class LogSanitizer {
     try {
       this.log('Starting rotation process')
 
-      // First, clean logs before rotation
-      await this.performCleaning()
-
-      // Rotate logs to legacy directory
+      // First, rotate original logs to legacy directory (BEFORE cleaning!)
       const rotateResult = await this.rotator.rotateToday()
       this.log(`Rotation completed: ${rotateResult.rotated} files rotated, ${rotateResult.errors} errors`)
 
