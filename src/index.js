@@ -7,18 +7,14 @@ const LogRotator = require('./modules/logRotator')
 class LogSanitizer {
   constructor() {
     this.logsDir = process.env.LOGS_DIR || '/root/.pm2/logs'
-    this.legacyDir = process.env.LEGACY_DIR || 'logs/legacy'
+    this.legacyDir = process.env.LEGACY_DIR || '/root/.pm2/logs/legacy'
     this.archiveSubdir = process.env.ARCHIVE_SUBDIR || 'daily'
     this.rotationHour = process.env.ROTATION_HOUR || 5
     this.monitoringInterval = process.env.MONITORING_INTERVAL_MINUTES || 30
     this.keepLegacyDays = process.env.KEEP_LEGACY_DAYS || 30
 
-    // Create full archive path with absolute path resolution
-    const baseLegacyPath = path.isAbsolute(this.legacyDir)
-      ? this.legacyDir
-      : path.resolve(process.cwd(), this.legacyDir)
-
-    this.archivePath = path.join(baseLegacyPath, this.archiveSubdir)
+    // Create archive path - simply join legacy dir with subdir
+    this.archivePath = path.join(this.legacyDir, this.archiveSubdir)
 
     this.initializeModules()
     this.setupScheduler()
