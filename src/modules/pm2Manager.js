@@ -44,16 +44,16 @@ class PM2Manager {
   async restartService(serviceName) {
     try {
       this.log(`Attempting to restart service: ${serviceName}`)
-      
+
       const { stdout, stderr } = await execAsync(`pm2 restart ${serviceName}`)
-      
+
       if (stderr && !stderr.includes('successfully')) {
         throw new Error(stderr)
       }
 
       this.log(`Successfully restarted service: ${serviceName}`)
       return { success: true, output: stdout }
-      
+
     } catch (error) {
       this.error(`Failed to restart service ${serviceName}`, error)
       return { success: false, error: error.message }
@@ -64,7 +64,7 @@ class PM2Manager {
     try {
       const services = await this.getRunningServices()
       const service = services.find(s => s.name === serviceName)
-      
+
       if (!service) {
         this.error(`Service not found: ${serviceName}`)
         return false

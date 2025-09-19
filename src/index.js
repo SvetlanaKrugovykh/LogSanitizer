@@ -41,7 +41,7 @@ class LogSanitizer {
 
     this.rotator = new LogRotator(this.logsDir, this.archivePath)
     this.pm2Manager = new PM2Manager()
-    
+
     this.setupPM2Restarts()
   }
 
@@ -72,7 +72,7 @@ class LogSanitizer {
   setupPM2Restarts() {
     try {
       const restartConfig = require('../pm2-restart-config.js')
-      
+
       let scheduledCount = 0
       for (const config of restartConfig) {
         if (!config.enabled) {
@@ -82,7 +82,7 @@ class LogSanitizer {
         cron.schedule(config.schedule, async () => {
           this.log(`PM2 scheduled restart triggered for: ${config.name}`)
           const result = await this.pm2Manager.executeRestart(config.name, config.description)
-          
+
           if (result.success) {
             this.log(`PM2 restart completed successfully: ${config.name}`)
           } else {
