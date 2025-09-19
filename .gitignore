@@ -1,6 +1,7 @@
 node_modules/
 .env
 templates.js
+pm2-restart-config.js
 logs/
 *.log
 .DS_Store

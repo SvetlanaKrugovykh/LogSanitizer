@@ -1,0 +1,43 @@
+// Example PM2 restart configuration
+// Copy this file to pm2-restart-config.js and customize for your needs
+
+module.exports = [
+  {
+    name: "multi-ping",
+    schedule: "0 */2 * * *", // Every 2 hours at minute 0
+    description: "MultiPing service - restart every 2 hours during day",
+    enabled: true
+  },
+  {
+    name: "net-monitor", 
+    schedule: "0 0 * * *", // Daily at 00:00
+    description: "NetMonitor service - restart once daily at midnight",
+    enabled: true
+  },
+  {
+    name: "smtp-server",
+    schedule: "0 4 * * *", // Daily at 4:00 AM
+    description: "SMTP server - daily restart at 4 AM", 
+    enabled: false
+  },
+  {
+    name: "mail-bridge",
+    schedule: "0 6 * * 1", // Weekly on Monday at 6:00 AM
+    description: "Mail bridge service - weekly restart Monday 6 AM",
+    enabled: false
+  },
+  {
+    name: "logSanitizer",
+    schedule: "0 3 * * *", // Daily at 3:00 AM
+    description: "Log Sanitizer itself - daily restart at 3 AM",
+    enabled: false
+  }
+]
+
+// Schedule format: "minute hour day-of-month month day-of-week"
+// Examples:
+// "0 */6 * * *"     - Every 6 hours at minute 0
+// "30 2 * * *"      - Daily at 2:30 AM
+// "0 12 * * 0"      - Weekly on Sunday at noon
+// "0 0 1 * *"       - Monthly on 1st day at midnight
+// "*/15 9-17 * * 1-5" - Every 15 minutes during business hours weekdays

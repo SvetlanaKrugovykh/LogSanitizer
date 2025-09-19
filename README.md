@@ -9,6 +9,7 @@ Node.js application for automated PM2 log management - cleaning, rotation, and a
 - **Old Log Cleanup**: Automatically deletes logs older than specified days
 - **Scheduled Operations**: Configurable monitoring and rotation schedules
 - **PM2 Integration**: Designed for PM2 log directory structure
+- **PM2 Auto-Restart**: Scheduled automatic restart of PM2 services
 
 ## Installation
 

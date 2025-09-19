@@ -3,6 +3,7 @@ const cron = require('node-cron')
 const path = require('path')
 const LogCleaner = require('./modules/logCleaner')
 const LogRotator = require('./modules/logRotator')
+const PM2Manager = require('./modules/pm2Manager')
 
 class LogSanitizer {
   constructor() {
@@ -39,6 +40,9 @@ class LogSanitizer {
     }
 
     this.rotator = new LogRotator(this.logsDir, this.archivePath)
+    this.pm2Manager = new PM2Manager()
+    
+    this.setupPM2Restarts()
   }
 
   setupScheduler() {
@@ -63,6 +67,38 @@ class LogSanitizer {
     this.log(`- Legacy directory: ${this.legacyDir}`)
     this.log(`- Archive directory (absolute): ${this.archivePath}`)
     this.log(`- Working directory: ${process.cwd()}`)
+  }
+
+  setupPM2Restarts() {
+    try {
+      const restartConfig = require('../pm2-restart-config.js')
+      
+      let scheduledCount = 0
+      for (const config of restartConfig) {
+        if (!config.enabled) {
+          continue
+        }
+
+        cron.schedule(config.schedule, async () => {
+          this.log(`PM2 scheduled restart triggered for: ${config.name}`)
+          const result = await this.pm2Manager.executeRestart(config.name, config.description)
+          
+          if (result.success) {
+            this.log(`PM2 restart completed successfully: ${config.name}`)
+          } else {
+            this.error(`PM2 restart failed for ${config.name}: ${result.reason || result.error}`)
+          }
+        })
+
+        scheduledCount++
+        this.log(`PM2 restart scheduled: ${config.name} - ${config.description}`)
+      }
+
+      this.log(`PM2 restart scheduler initialized: ${scheduledCount} services scheduled`)
+
+    } catch (error) {
+      this.log('PM2 restart config not found - PM2 restart feature disabled')
+    }
   }
 
   async performCleaning() {
